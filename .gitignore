@@ -1,0 +1,6 @@
+TransactionService/configs/apiserver.toml
+TransactionService/.vscode/
+TransactionService/.idea/
+DB/.env
+DB/db-data/
+.env
