@@ -1,5 +1,6 @@
 package store
 
 type Store interface {
-	Transaction() TransactionRepo
+	// Transaction() TransactionRepo
+	User() UserRepo
 }
