@@ -11,6 +11,7 @@ type Store struct {
 	db              *sql.DB
 	userRepo        *UserRepo
 	transactionRepo *TransactionRepo
+	balanceRepo     *BalanceRepo
 }
 
 func New(db *sql.DB) *Store {
@@ -28,6 +29,17 @@ func (s *Store) User() store.UserRepo {
 		store: s,
 	}
 	return s.userRepo
+}
+
+func (s *Store) Balance() store.BalanceRepo {
+	if s.balanceRepo != nil {
+		return s.balanceRepo
+	}
+
+	s.balanceRepo = &BalanceRepo{
+		store: s,
+	}
+	return s.balanceRepo
 }
 
 func (s *Store) TransactionRepo() store.TransactionRepo {
