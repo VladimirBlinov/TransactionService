@@ -66,6 +66,15 @@ func Test_UserValidate(t *testing.T) {
 			},
 			isValid: true,
 		},
+		{
+			name: "invalid balance",
+			u: func() *model.User {
+				u := model.TestUser(t)
+				u.Balance = -1
+				return u
+			},
+			isValid: false,
+		},
 	}
 
 	for _, tc := range testCases {

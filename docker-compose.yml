@@ -17,7 +17,8 @@ services:
       test: ["CMD", "pg_isready", "-U", "admin", "-d", "Transaction"]
       interval: 5s
       timeout: 5s
-      retries: 20
+      start_period: 5s
+      retries: 30
 
   migrate_dev:
     image: migrate/migrate
@@ -27,6 +28,15 @@ services:
     volumes:
         - ./DB/migrations:/migrations
     command: ["-database",  "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/TransactionDev?sslmode=disable", "-path", "/migrations", "up"]
+
+  migrate_test:
+    image: migrate/migrate
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+    volumes:
+        - ./DB/migrations:/migrations
+    command: ["-database",  "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/TransactionTest?sslmode=disable", "-path", "/migrations", "up"]
 
   migrate_prod:
     image: migrate/migrate

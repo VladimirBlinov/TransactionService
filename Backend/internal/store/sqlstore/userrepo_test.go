@@ -17,6 +17,7 @@ func TestUserRepo_Create(t *testing.T) {
 	u := model.TestUser(t)
 	assert.NoError(t, s.User().Create(u))
 	assert.NotNil(t, u)
+	assert.NotEqual(t, 0, u.BalanceID)
 }
 
 func TestFindByEmail(t *testing.T) {
