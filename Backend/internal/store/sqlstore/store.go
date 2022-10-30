@@ -7,14 +7,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// Store
 type Store struct {
-	db       *sql.DB
-	userRepo *UserRepo
-	// transactionRepo *TransactionRepo
+	db              *sql.DB
+	userRepo        *UserRepo
+	transactionRepo *TransactionRepo
 }
 
-// Store constructor
 func New(db *sql.DB) *Store {
 	return &Store{
 		db: db,
@@ -32,13 +30,13 @@ func (s *Store) User() store.UserRepo {
 	return s.userRepo
 }
 
-// func (s *Store) TransactionRepo() store.TransactionRepo {
-// 	if s.transactionRepo != nil {
-// 		return s.transactionRepo
-// 	}
+func (s *Store) TransactionRepo() store.TransactionRepo {
+	if s.transactionRepo != nil {
+		return s.transactionRepo
+	}
 
-// 	s.transactionRepo = &TransactionRepo{
-// 		store: s,
-// 	}
-// 	return s.transactionRepo
-// }
+	s.transactionRepo = &TransactionRepo{
+		store: s,
+	}
+	return s.transactionRepo
+}

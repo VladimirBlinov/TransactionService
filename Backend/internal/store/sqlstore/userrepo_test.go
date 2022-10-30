@@ -11,7 +11,7 @@ import (
 
 func TestUserRepo_Create(t *testing.T) {
 	db, teardown := sqlstore.TestDB(t, databaseURL)
-	defer teardown("user")
+	defer teardown("users")
 
 	s := sqlstore.New(db)
 	u := model.TestUser(t)
@@ -21,7 +21,7 @@ func TestUserRepo_Create(t *testing.T) {
 
 func TestFindByEmail(t *testing.T) {
 	db, teardown := sqlstore.TestDB(t, databaseURL)
-	defer teardown("user")
+	defer teardown("users")
 
 	s := sqlstore.New(db)
 
@@ -43,7 +43,7 @@ func TestFindByEmail(t *testing.T) {
 
 func TestFindById(t *testing.T) {
 	db, teardown := sqlstore.TestDB(t, databaseURL)
-	defer teardown("user")
+	defer teardown("users")
 
 	s := sqlstore.New(db)
 	u1 := model.TestUser(t)
