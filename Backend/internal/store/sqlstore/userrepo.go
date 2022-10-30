@@ -13,8 +13,6 @@ type UserRepo struct {
 }
 
 func (r *UserRepo) Create(u *model.User) error {
-	u.Balance = 0
-
 	if err := u.Validate(); err != nil {
 		return err
 	}
@@ -124,4 +122,27 @@ func (r *UserRepo) FindById(id int) (*model.User, error) {
 	}
 
 	return u, nil
+}
+
+func (r *UserRepo) GetBalance(userID int) (float64, error) {
+	balance := 0.0
+	if err := r.store.db.QueryRow(
+		`SELECT balance FROM public.balance_audit as ba
+		inner join public.balance as b on b.id = ba.balance_id
+		inner join public.user_balance as ub on b.id = ub.balance_id
+		
+		where b.active = true and ub.user_id = $1
+		order by ba.last_audit_time desc
+		limit 1`,
+		userID,
+	).Scan(
+		&balance,
+	); err != nil {
+		if err == sql.ErrNoRows {
+			return balance, store.ErrRecordNotFound
+		}
+		return balance, err
+	}
+
+	return balance, nil
 }

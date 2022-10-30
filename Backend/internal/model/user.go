@@ -11,7 +11,7 @@ type User struct {
 	Email             string  `json:"email"`
 	Password          string  `json:"password,omitempty"`
 	EncryptedPassword string  `json:"-"`
-	Balance           float32 `json:"balance"`
+	Balance           float64 `json:"balance"`
 	BalanceID         int     `json:"balance_id"`
 }
 
@@ -20,7 +20,7 @@ func (u *User) Validate() error {
 		u,
 		validation.Field(&u.Email, validation.Required, is.Email),
 		validation.Field(&u.Password, validation.By(requiredIf(u.EncryptedPassword == "")), validation.Length(4, 50)),
-		validation.Field(&u.Balance, validation.Min(0)),
+		validation.Field(&u.Balance, validation.Min(float64(0))),
 	)
 }
 
