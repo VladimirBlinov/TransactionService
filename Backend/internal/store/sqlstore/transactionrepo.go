@@ -2,7 +2,6 @@ package sqlstore
 
 import (
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/model"
-	"github.com/VladimirBlinov/TransactionService/Backend/internal/store"
 )
 
 type TransactionRepo struct {
@@ -52,8 +51,4 @@ func (trr *TransactionRepo) Create(trm *model.Transaction) error {
 	}
 
 	return tx.Commit()
-}
-
-func (trr *TransactionRepo) GetBalance(*store.UserID) (*store.UserBalance, error) {
-	return nil, nil
 }
