@@ -23,12 +23,13 @@ func (tr *Transaction) Validate() error {
 	)
 }
 
-func (tr *Transaction) CheckIsValid(balance float64) bool {
+func (tr *Transaction) CheckIsValid(balance float64) error {
 	if balance+tr.Amount >= 0 {
 		tr.IsValid = true
-	} else {
-		tr.IsValid = false
+		return nil
 	}
 
-	return tr.IsValid
+	tr.IsValid = false
+
+	return ErrTransactionOutOfBalance
 }

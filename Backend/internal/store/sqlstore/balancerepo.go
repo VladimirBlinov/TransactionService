@@ -105,5 +105,9 @@ func (br *BalanceRepo) UpdateBalance(b *model.Balance) error {
 		b.AuditTime,
 	).Err()
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

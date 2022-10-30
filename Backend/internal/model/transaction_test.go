@@ -101,9 +101,9 @@ func Test_TransactionCheckValid(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.isValid {
-				assert.True(t, tc.tr().CheckIsValid(tc.balance))
+				assert.NoError(t, tc.tr().CheckIsValid(tc.balance))
 			} else {
-				assert.False(t, tc.tr().CheckIsValid(tc.balance))
+				assert.Error(t, tc.tr().CheckIsValid(tc.balance))
 			}
 		})
 	}
