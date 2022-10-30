@@ -11,6 +11,7 @@ type Transaction struct {
 	UserID   int       `json:"user_id"`
 	Amount   float64   `json:"amount"`
 	DateTime time.Time `json:"date_time"`
+	IsValid  bool
 }
 
 func (tr *Transaction) Validate() error {
@@ -20,4 +21,14 @@ func (tr *Transaction) Validate() error {
 		validation.Field(&tr.Amount, validation.Required),
 		validation.Field(&tr.DateTime, validation.Required),
 	)
+}
+
+func (tr *Transaction) CheckIsValid(balance float64) bool {
+	if balance+tr.Amount >= 0 {
+		tr.IsValid = true
+	} else {
+		tr.IsValid = false
+	}
+
+	return tr.IsValid
 }

@@ -15,5 +15,5 @@ type UserRepo interface {
 type BalanceRepo interface {
 	Create(*model.Balance) error
 	GetBalanceByUserID(int) (*model.Balance, error)
-	// UpdateBalance(*model.Balance) error
+	UpdateBalance(*model.Balance) error
 }

@@ -92,3 +92,18 @@ func (br *BalanceRepo) GetBalanceByUserID(userID int) (*model.Balance, error) {
 
 	return b, nil
 }
+
+func (br *BalanceRepo) UpdateBalance(b *model.Balance) error {
+	if err := b.Validate(); err != nil {
+		return err
+	}
+
+	err := br.store.db.QueryRow(
+		"INSERT INTO public.balance_audit (balance_id, balance, last_audit_time) VALUES ($1, $2, $3)",
+		b.ID,
+		b.Balance,
+		b.AuditTime,
+	).Err()
+
+	return err
+}

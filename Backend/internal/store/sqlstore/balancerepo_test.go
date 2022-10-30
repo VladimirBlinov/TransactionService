@@ -35,7 +35,7 @@ func Test_GetBalanceByUserID(t *testing.T) {
 
 	b := model.TestBalance(t)
 	b.UserID = u.ID
-	_ = s.Balance().Create(b)
+	s.Balance().Create(b)
 
 	ub, err := s.Balance().GetBalanceByUserID(u.ID)
 
@@ -43,20 +43,26 @@ func Test_GetBalanceByUserID(t *testing.T) {
 	assert.Equal(t, b.Balance, ub.Balance)
 }
 
-// func Test_UpdateBalance(t *testing.T) {
-// 	db, teardown := sqlstore.TestDB(t, databaseURL)
-// 	defer teardown("users", "balance", "balance_audit", "user_balance")
+func Test_UpdateBalance(t *testing.T) {
+	db, teardown := sqlstore.TestDB(t, databaseURL)
+	defer teardown("users", "balance", "balance_audit", "user_balance")
 
-// 	s := sqlstore.New(db)
-// 	u := model.TestUser(t)
-// 	u.Balance = 200
-// 	s.User().Create(u)
+	s := sqlstore.New(db)
+	u := model.TestUser(t)
+	s.User().Create(u)
 
-// 	tr := model.TestTransaction(t)
-// 	u.ChangeBalance(tr.Amount)
+	b := model.TestBalance(t)
+	b.UserID = u.ID
+	s.Balance().Create(b)
 
-// 	assert.NoError(t, s.User().UpdateBalance(u))
+	initBalance := b.Balance
 
-// 	b, _ := s.User().GetBalance(u.ID)
-// 	assert.Equal(t, u.Balance+tr.Amount, b)
-// }
+	tr := model.TestTransaction(t)
+
+	b.ChangeBalance(tr.Amount, tr.DateTime)
+
+	assert.NoError(t, s.Balance().UpdateBalance(b))
+
+	bu, _ := s.Balance().GetBalanceByUserID(u.ID)
+	assert.Equal(t, initBalance+tr.Amount, bu.Balance)
+}
