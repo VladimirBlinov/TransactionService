@@ -1,7 +1,4 @@
-TransactionService/configs/apiserver.toml
-TransactionService/.vscode/
-TransactionService/.idea/
-DB/.env
+Backend/.vscode/
+Backend/.idea/
 DB/db-data/
-.env
 Rabbit/data
