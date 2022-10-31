@@ -13,10 +13,9 @@ type Balance struct {
 	AuditTime time.Time `json:"audit_time"`
 }
 
-func (b *Balance) ChangeBalance(amount float64, auditTime time.Time) error {
+func (b *Balance) ChangeBalance(amount float64, auditTime time.Time) {
 	b.Balance += amount
 	b.AuditTime = auditTime
-	return nil
 }
 
 func (b *Balance) Validate() error {
