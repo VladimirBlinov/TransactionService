@@ -19,13 +19,6 @@ func (b *Balance) ChangeBalance(amount float64, auditTime time.Time) error {
 	return nil
 }
 
-func (b *Balance) ValidateBalanceChange(amount float64) bool {
-	if b.Balance+amount >= 0 {
-		return true
-	}
-	return false
-}
-
 func (b *Balance) Validate() error {
 	return validation.ValidateStruct(
 		b,

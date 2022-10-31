@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	SessionName            = "MarketPlace"
+	SessionName            = "Transaction"
 	CtxKeyUser      ctxKey = iota
 	ctxKeyRequestID ctxKey = iota
 )

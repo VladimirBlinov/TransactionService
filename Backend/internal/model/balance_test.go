@@ -2,6 +2,7 @@ package model_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/model"
 	"github.com/stretchr/testify/assert"
@@ -42,12 +43,12 @@ func Test_BalanceValidate(t *testing.T) {
 	}
 }
 
-func Test_ValidateBalanceChange(t *testing.T) {
+func Test_BalanceChange(t *testing.T) {
 	testCases := []struct {
-		name    string
-		b       func() *model.Balance
-		amount  float64
-		isValid bool
+		name   string
+		b      func() *model.Balance
+		amount float64
+		expect float64
 	}{
 		{
 			name: "valid",
@@ -56,8 +57,8 @@ func Test_ValidateBalanceChange(t *testing.T) {
 				b.Balance = 100
 				return b
 			},
-			amount:  100,
-			isValid: true,
+			amount: 100,
+			expect: 200,
 		},
 		{
 			name: "invalid",
@@ -66,17 +67,15 @@ func Test_ValidateBalanceChange(t *testing.T) {
 				b.Balance = 100
 				return b
 			},
-			amount:  -200,
-			isValid: false,
+			amount: -200,
+			expect: -100,
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			if tc.isValid {
-				assert.True(t, tc.b().ValidateBalanceChange(tc.amount))
-			} else {
-				assert.False(t, tc.b().ValidateBalanceChange(tc.amount))
-			}
+			b := tc.b()
+			b.ChangeBalance(tc.amount, time.Now())
+			assert.Equal(t, tc.expect, b.Balance)
 		})
 	}
 }

@@ -57,24 +57,36 @@ services:
      - ./Rabbit/data/:/var/lib/rabbitmq/mnesia/
     restart: always
 
+  apiserver:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/usr/src/app
+    depends_on:
+      - migrate_prod
+      - rabbitmq
+    ports:
+      - "8080:8080"
 
-  # apiserver:
-  #   build:
-  #     context: ./MarketPlace
-  #     dockerfile: Dockerfile
-  #   volumes:
-  #     - ./:/usr/src/app
-  #   depends_on:
-  #     - migrate_prod
-  #   ports:
-  #     - "8080:8080"
+  worker:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile.worker
+    volumes:
+      - ./:/usr/src/app
+    depends_on:
+      - migrate_prod
+      - rabbitmq
+
 
   nginx:
     build:
       context: ./nginx
       dockerfile: Dockerfile
-    # depends_on:
-      # - apiserver
+    depends_on:
+      - apiserver
+      - worker
     ports:
       - "80:80"
 

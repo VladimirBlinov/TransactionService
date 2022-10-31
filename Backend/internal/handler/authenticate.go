@@ -53,6 +53,12 @@ func (h *Handler) handleRegister() http.HandlerFunc {
 			return
 		}
 
+		_, err = h.service.BalanceService.CreateBalance(u)
+		if err != nil {
+			h.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
 		h.respond(w, r, http.StatusCreated, u)
 	}
 }
