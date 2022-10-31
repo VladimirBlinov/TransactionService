@@ -4,3 +4,4 @@ TransactionService/.idea/
 DB/.env
 DB/db-data/
 .env
+Rabbit/data
