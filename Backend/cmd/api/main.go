@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/VladimirBlinov/TransactionService/Backend/internal/app/apiserver"
 	"github.com/sirupsen/logrus"
 
 	"github.com/BurntSushi/toml"

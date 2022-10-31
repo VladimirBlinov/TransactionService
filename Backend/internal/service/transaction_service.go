@@ -23,16 +23,10 @@ func NewTransactionService(store store.Store) *TransactionService {
 	}
 }
 
-func (trs *TransactionService) CreateTransaction(req *InputTransaction) (*model.Transaction, error) {
-	tr := &model.Transaction{}
-
-	tr.UserID = req.UserID
-	tr.Amount = req.Amount
-	tr.DateTime = req.DateTime
-
+func (trs *TransactionService) CreateTransaction(tr *model.Transaction) error {
 	if err := trs.store.Transaction().Create(tr); err != nil {
-		return nil, err
+		return err
 	}
 
-	return tr, nil
+	return nil
 }

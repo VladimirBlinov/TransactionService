@@ -18,6 +18,6 @@ func TestTransactionRepo_Create(t *testing.T) {
 
 	tr := model.TestTransaction(t)
 	tr.UserID = u.ID
-	assert.NoError(t, s.TransactionRepo().Create(tr))
+	assert.NoError(t, s.Transaction().Create(tr))
 	assert.NotNil(t, tr)
 }

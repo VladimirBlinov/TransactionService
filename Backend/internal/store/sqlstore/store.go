@@ -42,7 +42,7 @@ func (s *Store) Balance() store.BalanceRepo {
 	return s.balanceRepo
 }
 
-func (s *Store) TransactionRepo() store.TransactionRepo {
+func (s *Store) Transaction() store.TransactionRepo {
 	if s.transactionRepo != nil {
 		return s.transactionRepo
 	}
