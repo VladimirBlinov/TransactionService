@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/handler"
+	"github.com/VladimirBlinov/TransactionService/Backend/internal/rabbitmq/rabbit"
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/service"
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/store/sqlstore"
 	"github.com/gorilla/sessions"
@@ -18,6 +19,11 @@ type ApiServer struct {
 }
 
 func (s *ApiServer) Start(config *Config) error {
+	rmq, err := rabbit.NewRabbitMQ()
+	if err != nil {
+		return err
+	}
+
 	db, err := newDB(config.DataBaseURL)
 	if err != nil {
 		return err
@@ -32,7 +38,7 @@ func (s *ApiServer) Start(config *Config) error {
 	store := sqlstore.New(db)
 	sessionStore := sessions.NewCookieStore([]byte(config.SessionKey))
 	services := service.NewService(store)
-	handlers := handler.NewHandler(services, sessionStore)
+	handlers := handler.NewHandler(services, sessionStore, rmq)
 	handlers.InitHandler()
 
 	s.httpServer = &http.Server{

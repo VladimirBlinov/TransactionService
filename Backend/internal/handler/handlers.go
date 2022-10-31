@@ -30,14 +30,16 @@ type Handler struct {
 	sessionStore sessions.Store
 	Router       *mux.Router
 	logger       *logrus.Logger
+	rmq          *RabbitMQ
 }
 
-func NewHandler(service *service.Service, sessionStore sessions.Store) *Handler {
+func NewHandler(service *service.Service, sessionStore sessions.Store, rmq *RabbitMQ) *Handler {
 	return &Handler{
 		service:      service,
 		sessionStore: sessionStore,
 		Router:       mux.NewRouter(),
 		logger:       logrus.New(),
+		rmq:          rmq,
 	}
 }
 

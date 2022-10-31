@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"fmt"
 	"log"
 
 	"github.com/BurntSushi/toml"
@@ -46,6 +47,11 @@ func main() {
 	store := sqlstore.New(db)
 	services := service.NewService(store)
 	tw := worker.NewTransactionWorker(services)
+
+	rmq, err := rabbit.NewRabbitMQ()
+	if err != nil {
+		return nil, fmt.Errorf("internal.NewRabbitMQ %w", err)
+	}
 
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
