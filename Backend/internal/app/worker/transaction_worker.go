@@ -21,11 +21,6 @@ func NewTransactionWorker(service *service.Service) *TransactionWorker {
 func (tw *TransactionWorker) Run(task []byte) []byte {
 	tr := &model.Transaction{}
 
-	// d := json.NewDecoder(bytes.NewReader(task))
-	// // d.UseNumber()
-
-	// d.Decode(tr)
-
 	if err := json.Unmarshal(task, tr); err != nil {
 		return tw.error(err)
 	}
