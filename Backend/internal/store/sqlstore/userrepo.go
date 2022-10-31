@@ -41,7 +41,7 @@ func (r *UserRepo) FindByEmail(email string) (*model.User, error) {
 		&u.EncryptedPassword,
 	); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, store.ErrRecordNotFound
+			return nil, store.ErrUserRecordNotFound
 		}
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (r *UserRepo) FindById(id int) (*model.User, error) {
 		&u.EncryptedPassword,
 	); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, store.ErrRecordNotFound
+			return nil, store.ErrUserRecordNotFound
 		}
 		return nil, err
 	}

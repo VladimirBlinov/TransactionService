@@ -8,15 +8,70 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/handler"
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/model"
+	rabbit "github.com/VladimirBlinov/TransactionService/Backend/internal/rabbitmq"
+
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/service"
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/store/sqlstore"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/stretchr/testify/assert"
 )
+
+func Test_ServerHandleTransaction(t *testing.T) {
+	db, teardown := sqlstore.TestDB(t, databaseURL)
+	defer teardown("users", "transaction", "user_transaction", "user_balance", "balance_audit", "balance")
+
+	store := sqlstore.New(db)
+	services := service.NewService(store)
+
+	u := model.TestUser(t)
+	store.User().Create(u)
+
+	secretKey := []byte("secret_key")
+	rmq, _ := rabbit.NewRabbitMQ()
+	handlers := handler.NewHandler(services, sessions.NewCookieStore(secretKey), rmq)
+	handlers.InitHandler()
+	sc := securecookie.New(secretKey, nil)
+
+	testCases := []struct {
+		name         string
+		payload      interface{}
+		context      *model.User
+		coockieValue map[interface{}]interface{}
+		expectedCode int
+	}{
+		{
+			name: "valid",
+			payload: map[string]interface{}{
+				"user_id":   u.ID,
+				"amount":    -1200.0,
+				"date_time": time.Now(),
+			},
+			context: u,
+			coockieValue: map[interface{}]interface{}{
+				"user_id": u.ID,
+			},
+			expectedCode: http.StatusCreated,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			b := &bytes.Buffer{}
+			json.NewEncoder(b).Encode(tc.payload)
+			req, _ := http.NewRequest(http.MethodPost, "/api/v1/private/transaction/", b)
+			coockieStr, _ := sc.Encode(handler.SessionName, tc.coockieValue)
+			req.Header.Set("Cookie", fmt.Sprintf("%s=%s", handler.SessionName, coockieStr))
+			ctx := context.WithValue(req.Context(), handler.CtxKeyUser, tc.context)
+			handlers.Router.ServeHTTP(rec, req.WithContext(ctx))
+			assert.Equal(t, tc.expectedCode, rec.Code)
+		})
+	}
+}
 
 func TestServerHandleSignOut(t *testing.T) {
 	db, teardown := sqlstore.TestDB(t, databaseURL)
@@ -29,7 +84,8 @@ func TestServerHandleSignOut(t *testing.T) {
 	store.User().Create(u)
 
 	secretKey := []byte("secret_key")
-	handlers := handler.NewHandler(services, sessions.NewCookieStore(secretKey))
+	rmq, _ := rabbit.NewRabbitMQ()
+	handlers := handler.NewHandler(services, sessions.NewCookieStore(secretKey), rmq)
 	handlers.InitHandler()
 	sc := securecookie.New(secretKey, nil)
 
@@ -73,7 +129,8 @@ func TestServer_AuthenticateUser(t *testing.T) {
 	store.User().Create(u)
 
 	secretKey := []byte("secret_key")
-	handlers := handler.NewHandler(srvc, sessions.NewCookieStore(secretKey))
+	rmq, _ := rabbit.NewRabbitMQ()
+	handlers := handler.NewHandler(srvc, sessions.NewCookieStore(secretKey), rmq)
 	handlers.InitHandler()
 	sc := securecookie.New(secretKey, nil)
 	handl := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -119,7 +176,8 @@ func TestServer_HandleRegister(t *testing.T) {
 	store := sqlstore.New(db)
 	srvc := service.NewService(store)
 
-	handlers := handler.NewHandler(srvc, sessions.NewCookieStore([]byte("secret_key")))
+	rmq, _ := rabbit.NewRabbitMQ()
+	handlers := handler.NewHandler(srvc, sessions.NewCookieStore([]byte("secret_key")), rmq)
 	handlers.InitHandler()
 	testCases := []struct {
 		name         string
@@ -170,7 +228,8 @@ func TestServer_HandleSignIn(t *testing.T) {
 	u := model.TestUser(t)
 	store.User().Create(u)
 
-	handlers := handler.NewHandler(srvc, sessions.NewCookieStore([]byte("secret_key")))
+	rmq, _ := rabbit.NewRabbitMQ()
+	handlers := handler.NewHandler(srvc, sessions.NewCookieStore([]byte("secret_key")), rmq)
 	handlers.InitHandler()
 	testCases := []struct {
 		name         string

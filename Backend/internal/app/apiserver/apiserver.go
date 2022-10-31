@@ -7,7 +7,8 @@ import (
 	"time"
 
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/handler"
-	"github.com/VladimirBlinov/TransactionService/Backend/internal/rabbitmq/rabbit"
+	rabbit "github.com/VladimirBlinov/TransactionService/Backend/internal/rabbitmq"
+
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/service"
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/store/sqlstore"
 	"github.com/gorilla/sessions"
@@ -23,6 +24,7 @@ func (s *ApiServer) Start(config *Config) error {
 	if err != nil {
 		return err
 	}
+	defer rmq.Close()
 
 	db, err := newDB(config.DataBaseURL)
 	if err != nil {

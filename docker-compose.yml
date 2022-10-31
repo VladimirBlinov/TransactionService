@@ -46,6 +46,17 @@ services:
     volumes:
         - ./DB/migrations:/migrations
     command: ["-database",  "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/Transaction?sslmode=disable", "-path", "/migrations", "up"]
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+     - ./Rabbit/data/:/var/lib/rabbitmq/mnesia/
+    restart: always
+
 
   # apiserver:
   #   build:

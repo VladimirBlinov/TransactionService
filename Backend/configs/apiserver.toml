@@ -1,4 +1,4 @@
 bind_addr = ":8080"
 log_level = "debug"
-database_url = "host=postgresdb port=5435 user=admin password=qaz dbname=Transaction sslmode=disable"
+database_url = "host=localhost port=5435 user=admin password=qaz dbname=Transaction sslmode=disable"
 session_key = "wnNdfAdoYs6IB1qG0qRFQoxvqWvMSZql"

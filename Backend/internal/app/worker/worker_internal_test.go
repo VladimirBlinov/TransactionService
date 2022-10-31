@@ -3,6 +3,7 @@ package worker_test
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/app/worker"
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/model"
@@ -34,16 +35,18 @@ func Test_WorkerRun(t *testing.T) {
 		{
 			name: "valid",
 			message: map[string]interface{}{
-				"user_id": u.ID,
-				"amount":  200.0,
+				"user_id":   u.ID,
+				"amount":    200.0,
+				"date_time": time.Now(),
 			},
 			success: true,
 		},
 		{
 			name: "invalid",
 			message: map[string]interface{}{
-				"user_id": u.ID,
-				"amount":  -1200.0,
+				"user_id":   u.ID,
+				"amount":    -1200.0,
+				"date_time": time.Now(),
 			},
 			success: false,
 		},

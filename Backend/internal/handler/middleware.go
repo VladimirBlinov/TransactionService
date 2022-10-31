@@ -2,10 +2,11 @@ package handler
 
 import (
 	"context"
-	"github.com/google/uuid"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 func (h *Handler) setRequestID(next http.Handler) http.Handler {
@@ -18,11 +19,17 @@ func (h *Handler) setRequestID(next http.Handler) http.Handler {
 
 func (h *Handler) logRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		session, _ := h.sessionStore.Get(r, SessionName)
+		id, ok := session.Values["user_id"]
+		if !ok {
+			id = 0
+		}
+
 		logger := h.logger.WithFields(logrus.Fields{
 			"remote_addr": r.RemoteAddr,
 			"request_id":  r.Context().Value(ctxKeyRequestID),
 			"method":      r.Method,
-			"user_id":     r.Context().Value(CtxKeyUser),
+			"user_id":     id,
 			"url":         r.URL.Path,
 		})
 		logger.Infof("started %s %s", r.Method, r.RequestURI)

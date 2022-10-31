@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	rabbit "github.com/VladimirBlinov/TransactionService/Backend/internal/rabbitmq"
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/service"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -30,10 +31,10 @@ type Handler struct {
 	sessionStore sessions.Store
 	Router       *mux.Router
 	logger       *logrus.Logger
-	rmq          *RabbitMQ
+	rmq          *rabbit.RabbitMQ
 }
 
-func NewHandler(service *service.Service, sessionStore sessions.Store, rmq *RabbitMQ) *Handler {
+func NewHandler(service *service.Service, sessionStore sessions.Store, rmq *rabbit.RabbitMQ) *Handler {
 	return &Handler{
 		service:      service,
 		sessionStore: sessionStore,

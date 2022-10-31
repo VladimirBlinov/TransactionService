@@ -85,7 +85,7 @@ func (br *BalanceRepo) GetBalanceByUserID(userID int) (*model.Balance, error) {
 		&b.AuditTime,
 	); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, store.ErrRecordNotFound
+			return nil, store.ErrBalanceRecordNotFound
 		}
 		return nil, err
 	}

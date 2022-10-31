@@ -2,7 +2,6 @@ package worker
 
 import (
 	"encoding/json"
-	"time"
 
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/model"
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/service"
@@ -24,8 +23,6 @@ func (tw *TransactionWorker) Run(task []byte) []byte {
 	if err := json.Unmarshal(task, tr); err != nil {
 		return tw.error(err)
 	}
-
-	tr.DateTime = time.Now()
 
 	err := tw.service.TransactionService.CreateTransaction(tr)
 	if err != nil {

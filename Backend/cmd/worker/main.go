@@ -3,15 +3,13 @@ package main
 import (
 	"database/sql"
 	"flag"
-	"fmt"
 	"log"
 
 	"github.com/BurntSushi/toml"
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/app/worker"
+	rabbit "github.com/VladimirBlinov/TransactionService/Backend/internal/rabbitmq"
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/service"
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/store/sqlstore"
-
-	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func failOnError(err error, msg string) {
@@ -29,14 +27,10 @@ func init() {
 func main() {
 	config := worker.NewConfig()
 	_, err := toml.DecodeFile(configPath, config)
-	if err != nil {
-		failOnError(err, "Failed load config")
-	}
+	failOnError(err, "Failed load config")
 
 	db, err := newDB(config.DataBaseURL)
-	if err != nil {
-		failOnError(err, "Failed connect to DB")
-	}
+	failOnError(err, "Failed connect to DB")
 
 	defer func(db *sql.DB) {
 		if err = db.Close(); err != nil {
@@ -49,30 +43,10 @@ func main() {
 	tw := worker.NewTransactionWorker(services)
 
 	rmq, err := rabbit.NewRabbitMQ()
-	if err != nil {
-		return nil, fmt.Errorf("internal.NewRabbitMQ %w", err)
-	}
+	failOnError(err, "RabbitMQ init error")
+	defer rmq.Close()
 
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-	failOnError(err, "Failed to connect to RabbitMQ")
-	defer conn.Close()
-
-	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
-
-	err = ch.ExchangeDeclare(
-		"logs",   // name
-		"fanout", // type
-		true,     // durable
-		false,    // auto-deleted
-		false,    // internal
-		false,    // no-wait
-		nil,      // arguments
-	)
-	failOnError(err, "Failed to declare an exchange")
-
-	q, err := ch.QueueDeclare(
+	q, err := rmq.Channel.QueueDeclare(
 		"",    // name
 		false, // durable
 		false, // delete when unused
@@ -82,16 +56,16 @@ func main() {
 	)
 	failOnError(err, "Failed to declare a queue")
 
-	err = ch.QueueBind(
-		q.Name, // queue name
-		"",     // routing key
-		"logs", // exchange
+	err = rmq.Channel.QueueBind(
+		q.Name,  // queue name
+		"",      // routing key
+		"users", // exchange
 		false,
 		nil,
 	)
 	failOnError(err, "Failed to bind a queue")
 
-	msgs, err := ch.Consume(
+	msgs, err := rmq.Channel.Consume(
 		q.Name, // queue
 		"",     // consumer
 		true,   // auto-ack
@@ -108,7 +82,8 @@ func main() {
 		for d := range msgs {
 			log.Printf(" [x] %s", d.Body)
 
-			tw.Run(d.Body)
+			resp := tw.Run(d.Body)
+			log.Printf("Response [x] %s", resp)
 		}
 	}()
 

@@ -28,7 +28,7 @@ func TestFindByEmail(t *testing.T) {
 	email := "user@example.org"
 
 	_, err := s.User().FindByEmail(email)
-	assert.EqualError(t, err, store.ErrRecordNotFound.Error())
+	assert.EqualError(t, err, store.ErrUserRecordNotFound.Error())
 
 	u := model.TestUser(t)
 	u.Email = email
