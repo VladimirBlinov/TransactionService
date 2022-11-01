@@ -130,6 +130,14 @@ func (ws *WorkerServer) Start() error {
 	return nil
 }
 
+func (ws *WorkerServer) ShutDown(ctx context.Context) error {
+	ws.rmq.Close()
+	if err := ws.db.Close(); err != nil {
+		logrus.Errorf("error db close: %s", err.Error())
+	}
+	return nil
+}
+
 func newDB(databaseURL string) (*sql.DB, error) {
 	db, err := sql.Open("postgres", databaseURL)
 	if err != nil {
@@ -140,12 +148,4 @@ func newDB(databaseURL string) (*sql.DB, error) {
 		return nil, err
 	}
 	return db, nil
-}
-
-func (ws *WorkerServer) ShutDown(ctx context.Context) error {
-	ws.rmq.Close()
-	if err := ws.db.Close(); err != nil {
-		logrus.Errorf("error db close: %s", err.Error())
-	}
-	return nil
 }
