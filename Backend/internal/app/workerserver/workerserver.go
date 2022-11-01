@@ -29,12 +29,6 @@ func NewWorkerServer(config *Config) (*WorkerServer, error) {
 		return nil, errors.New("Failed connect to DB")
 	}
 
-	// defer func(db *sql.DB) {
-	// 	if err = db.Close(); err != nil {
-	// 		logrus.Errorf("error db close: %s", err.Error())
-	// 	}
-	// }(db)
-
 	store := sqlstore.New(db)
 	services := service.NewService(store)
 
@@ -42,8 +36,6 @@ func NewWorkerServer(config *Config) (*WorkerServer, error) {
 	if err != nil {
 		return nil, errors.New("RabbitMQ init error")
 	}
-
-	//defer rmq.Close()
 
 	return (&WorkerServer{
 		db:       db,
