@@ -20,7 +20,7 @@ type ApiServer struct {
 }
 
 func (s *ApiServer) Start(config *Config) error {
-	rmq, err := rabbit.NewRabbitMQ()
+	rmq, err := rabbit.NewRabbitMQ(config.RabbitURL)
 	if err != nil {
 		return err
 	}

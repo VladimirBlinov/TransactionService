@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/VladimirBlinov/TransactionService/Backend/internal/service"
@@ -21,14 +22,13 @@ func (h *Handler) handleTransactionProcess() http.HandlerFunc {
 			h.error(w, r, http.StatusInternalServerError, err)
 		}
 
-		err = h.rmq.Channel.ExchangeDeclare(
-			"users",  // name
-			"fanout", // type
-			true,     // durable
-			false,    // auto-deleted
-			false,    // internal
-			false,    // no-wait
-			nil,      // arguments
+		userQueue, err := h.rmq.Channel.QueueDeclare(
+			fmt.Sprintf("user.%d", req.UserID), // name
+			true,                               // durable
+			false,                              // delete when unused
+			false,                              // exclusive
+			false,                              // no-wait
+			nil,                                // arguments
 		)
 		if err != nil {
 			h.error(w, r, http.StatusInternalServerError, err)
@@ -36,10 +36,37 @@ func (h *Handler) handleTransactionProcess() http.HandlerFunc {
 		}
 
 		err = h.rmq.Channel.Publish(
-			"users", // exchange
-			"",      // routing key
-			false,   // mandatory
-			false,   // immediate
+			"",             // exchange
+			userQueue.Name, // routing key
+			false,          // mandatory
+			false,          // immediate
+			amqp.Publishing{
+				ContentType: "text/plain",
+				Body:        []byte(body),
+			})
+		if err != nil {
+			h.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		activeUsersQueue, err := h.rmq.Channel.QueueDeclare(
+			"active_users", // name
+			true,           // durable
+			false,          // delete when unused
+			false,          // exclusive
+			false,          // no-wait
+			nil,            // arguments
+		)
+		if err != nil {
+			h.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		err = h.rmq.Channel.Publish(
+			"",                    // exchange
+			activeUsersQueue.Name, // routing key
+			false,                 // mandatory
+			false,                 // immediate
 			amqp.Publishing{
 				ContentType: "text/plain",
 				Body:        []byte(body),

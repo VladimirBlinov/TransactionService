@@ -11,23 +11,23 @@ type RabbitMQ struct {
 	Channel    *amqp.Channel
 }
 
-func NewRabbitMQ() (*RabbitMQ, error) {
-	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
+func NewRabbitMQ(connUrl string) (*RabbitMQ, error) {
+	conn, err := amqp.Dial(connUrl)
 	failOnError(err, "Failed to connect to RabbitMQ")
 
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
 
-	err = ch.ExchangeDeclare(
-		"users",  // name
-		"fanout", // type
-		true,     // durable
-		false,    // auto-deleted
-		false,    // internal
-		false,    // no-wait
-		nil,      // arguments
-	)
-	failOnError(err, "Failed to declare an exchange")
+	// err = ch.ExchangeDeclare(
+	// 	"",    // name
+	// 	"",    // type
+	// 	true,  // durable
+	// 	false, // auto-deleted
+	// 	false, // internal
+	// 	false, // no-wait
+	// 	nil,   // arguments
+	// )
+	// failOnError(err, "Failed to declare an exchange")
 
 	return &RabbitMQ{
 		Connection: conn,

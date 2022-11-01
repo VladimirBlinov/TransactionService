@@ -32,7 +32,7 @@ func Test_ServerHandleTransaction(t *testing.T) {
 	store.User().Create(u)
 
 	secretKey := []byte("secret_key")
-	rmq, _ := rabbit.NewRabbitMQ()
+	rmq, _ := rabbit.NewRabbitMQ(rabbitURL)
 	handlers := handler.NewHandler(services, sessions.NewCookieStore(secretKey), rmq)
 	handlers.InitHandler()
 	sc := securecookie.New(secretKey, nil)
@@ -84,7 +84,7 @@ func TestServerHandleSignOut(t *testing.T) {
 	store.User().Create(u)
 
 	secretKey := []byte("secret_key")
-	rmq, _ := rabbit.NewRabbitMQ()
+	rmq, _ := rabbit.NewRabbitMQ(rabbitURL)
 	handlers := handler.NewHandler(services, sessions.NewCookieStore(secretKey), rmq)
 	handlers.InitHandler()
 	sc := securecookie.New(secretKey, nil)
@@ -129,7 +129,7 @@ func TestServer_AuthenticateUser(t *testing.T) {
 	store.User().Create(u)
 
 	secretKey := []byte("secret_key")
-	rmq, _ := rabbit.NewRabbitMQ()
+	rmq, _ := rabbit.NewRabbitMQ(rabbitURL)
 	handlers := handler.NewHandler(srvc, sessions.NewCookieStore(secretKey), rmq)
 	handlers.InitHandler()
 	sc := securecookie.New(secretKey, nil)
@@ -176,7 +176,7 @@ func TestServer_HandleRegister(t *testing.T) {
 	store := sqlstore.New(db)
 	srvc := service.NewService(store)
 
-	rmq, _ := rabbit.NewRabbitMQ()
+	rmq, _ := rabbit.NewRabbitMQ(rabbitURL)
 	handlers := handler.NewHandler(srvc, sessions.NewCookieStore([]byte("secret_key")), rmq)
 	handlers.InitHandler()
 	testCases := []struct {
@@ -228,7 +228,7 @@ func TestServer_HandleSignIn(t *testing.T) {
 	u := model.TestUser(t)
 	store.User().Create(u)
 
-	rmq, _ := rabbit.NewRabbitMQ()
+	rmq, _ := rabbit.NewRabbitMQ(rabbitURL)
 	handlers := handler.NewHandler(srvc, sessions.NewCookieStore([]byte("secret_key")), rmq)
 	handlers.InitHandler()
 	testCases := []struct {
