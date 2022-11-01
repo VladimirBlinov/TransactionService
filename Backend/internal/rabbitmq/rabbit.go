@@ -18,17 +18,6 @@ func NewRabbitMQ(connUrl string) (*RabbitMQ, error) {
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
 
-	// err = ch.ExchangeDeclare(
-	// 	"",    // name
-	// 	"",    // type
-	// 	true,  // durable
-	// 	false, // auto-deleted
-	// 	false, // internal
-	// 	false, // no-wait
-	// 	nil,   // arguments
-	// )
-	// failOnError(err, "Failed to declare an exchange")
-
 	return &RabbitMQ{
 		Connection: conn,
 		Channel:    ch,
